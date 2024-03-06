@@ -1,5 +1,6 @@
 /**
  * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ * Modified 2024 by TechnoDot
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,6 +10,16 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "hardware/i2c.h"
+
+#include "data.h"
+
+/* I have basically no idea wtf I'm doing
+   I try my best to avoid C
+   Writing an entire OS in C with custom drivers for sensors I have never used
+   ... yeah I'm not doing that
+   thanks RPi for letting me copy this code
+   the wonders of open-source software :)
+*/
 
 /* Example code to talk to a MPU6050 MEMS accelerometer and gyroscope
 
@@ -55,7 +66,7 @@ void init_mpu6050() {
     mpu6050_reset();
 }
 
-static void read_mpu6050(int16_t accel[3], int16_t gyro[3], int16_t *temp) {
+struct mpu6050_data_t read_mpu6050(int16_t accel[3], int16_t gyro[3], int16_t *temp) {
     // For this particular device, we send the device the register we want to read
     // first, then subsequently read from the device. The register is auto incrementing
     // so we don't need to keep sending the register we want, just the first.
@@ -88,4 +99,7 @@ static void read_mpu6050(int16_t accel[3], int16_t gyro[3], int16_t *temp) {
     i2c_read_blocking(i2c_default, addr, buffer, 2, false);  // False - finished with bus
 
     *temp = buffer[0] << 8 | buffer[1];
+
+    struct mpu6050_data_t data = {accel[3], gyro[3], *temp};
+    return data;
 }

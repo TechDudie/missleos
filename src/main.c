@@ -2,6 +2,9 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
+#include "accelerometer.c"
+#include "altimeter.c"
+
 int main() {
     stdio_init_all();
     if (cyw43_arch_init()) {

@@ -1,5 +1,6 @@
 /**
  * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Modified 2024 by TechnoDot
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,6 +10,16 @@
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
+
+#include "data.h"
+
+/* I have basically no idea wtf I'm doing
+   I try my best to avoid C
+   Writing an entire OS in C with custom drivers for sensors I have never used
+   ... yeah I'm not doing that
+   thanks RPi for letting me copy this code
+   the wonders of open-source software :)
+*/
 
 /* Example code to talk to an MPL3115A2 altimeter sensor via I2C
 
@@ -55,13 +66,6 @@
 
 volatile uint8_t fifo_data[MPL3115A2_FIFO_SIZE * MPL3115A2_DATA_BATCH_SIZE];
 volatile bool has_new_data = false;
-
-struct mpl3115a2_data_t {
-    // Q8.4 fixed point
-    float temperature;
-    // Q16.4 fixed-point
-    float altitude;
-};
 
 void copy_to_vbuf(uint8_t buf1[], volatile uint8_t buf2[], int buflen) {
     for (size_t i = 0; i < buflen; i++) {
@@ -177,7 +181,7 @@ void init_mpl3115a2() {
     gpio_set_irq_enabled_with_callback(INT1_PIN, GPIO_IRQ_LEVEL_LOW, true, &gpio_callback);
 }
 
-void read_mpl3115a2() {
+struct mpl3115a2_data_t read_mpl3115a2() {
     if (has_new_data) {
             float tsum = 0, hsum = 0;
             struct mpl3115a2_data_t data;
@@ -186,8 +190,9 @@ void read_mpl3115a2() {
                 tsum += data.temperature;
                 hsum += data.altitude;
             }
-            printf("%d sample average -> t: %.4f C, h: %.4f m\n", MPL3115A2_FIFO_SIZE, tsum / MPL3115A2_FIFO_SIZE,
-                   hsum / MPL3115A2_FIFO_SIZE);
             has_new_data = false;
+            data.temperature = tsum / MPL3115A2_FIFO_SIZE;
+            data.altitude = hsum / MPL3115A2_FIFO_SIZE;
+            return data;
         }
 }
