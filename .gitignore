@@ -4,3 +4,4 @@ cmake-*
 .DS_Store
 build
 pico
+missleos.uf2

@@ -5,7 +5,7 @@ project(missleos VERSION 1.0.0)
 set(PICO_BOARD pico_w)
 pico_sdk_init()
 
-add_executable(missleos src/main.c)
+add_executable(missleos src/altimeter.c)
 
 target_link_libraries(missleos
 pico_stdlib

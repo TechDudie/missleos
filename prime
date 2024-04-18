@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cp /workspaces/missleos/build/missleos.uf2 ./missleos.uf2
