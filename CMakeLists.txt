@@ -5,13 +5,13 @@ project(missleos VERSION 1.0.0)
 set(PICO_BOARD pico_w)
 pico_sdk_init()
 
-add_executable(missleos src/altimeter.c)
+add_executable(missleos src/main.c)
 
 target_link_libraries(missleos
 pico_stdlib
 pico_cyw43_arch_none
 hardware_i2c
-hardware_spi
+hardware_flash
 )
 
 pico_add_extra_outputs(missleos)
